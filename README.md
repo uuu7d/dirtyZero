@@ -1,10 +1,10 @@
 # dirtyZero
-**A simple customization toolbox, ultizing [CVE-2025-24203](https://project-zero.issues.chromium.org/issues/391518636)**
+**A simple customization toolbox, utilizing [CVE-2025-24203](https://project-zero.issues.chromium.org/issues/391518636)**
 
-[Download](https://github.com/jailbreakdotparty/dirtyZero/releases) • [Support Server](https://discord.gg/XPj66zZ4gT)
+[Download](https://github.com/jailbreakdotparty/dirtyZero/releases) • [Join our Discord!](https://discord.gg/XPj66zZ4gT)
 
->[!WARNING]
-> By using this tool, you agree that we (jailbreak.party) are not liablie for any damages or data loss caused by the usage of this application. Use at your own risk, and have a backup just in case.
+# Disclaimer
+All file modifications are done in memory. If something goes wrong or you want to revert the tweaks, just force reboot your phone.
 
 # Support Table
 | iOS Version | Support Status |
@@ -31,3 +31,8 @@ Unfortunately, there isn't an easy way to do this yet. Here are two methods:
 3. Click "Add language..."
 4. Choose any language.
 5. A popup will appear asking you to change your primary language. **Please select the language that you were using before.**
+
+
+# Credits
+- [Skadz](https://github.com/skadz108) for making this app.
+- Ian Beer of Google Project Zero for discovering and publishing the exploit.
