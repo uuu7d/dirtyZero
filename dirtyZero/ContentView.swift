@@ -7,6 +7,7 @@
 
 import SwiftUI
 import DeviceKit
+import notify
 
 struct ContentView: View {
     let device = Device.current
@@ -46,6 +47,13 @@ struct ContentView: View {
                         }
                         .onAppear(perform: {
                             print("[*] Welcome to dirtyZero!\n[*] Running on \(device.systemName!) \(device.systemVersion!), \(device.description)")
+                        })
+                    })
+                    
+                    Section(header: Text("Actions"), content: {
+                        Button("Attempt respring", action: {
+                            // i don't think this'll work but i'm adding this from my phone so clearly i got bigger problems
+                            notify_post("com.apple.springboard.toggleLockScreen")
                         })
                     })
                 }
