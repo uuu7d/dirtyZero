@@ -16,7 +16,10 @@ struct ContentView: View {
         NavigationStack {
             VStack {
                 List {
-                    Section {
+                    Section(header: HStack {
+                        Image(systemName: "terminal.fill")
+                        Text("Logs")
+                    }) {
                         HStack {
                             Spacer()
                             ZStack {
@@ -29,13 +32,12 @@ struct ContentView: View {
                         .onAppear(perform: {
                             print("[*] Welcome to dirtyZero!\n[*] Running on \(device.systemName!) \(device.systemVersion!), \(device.description)")
                         })
-                    } header: {
-                        HStack {
-                            Image(systemName: "terminal.fill")
-                            Text("Logs")
-                        }
                     }
-                    Section {
+                    
+                    Section(header: HStack {
+                        Image(systemName: "hammer.fill")
+                        Text("Tweaks")
+                    }, footer: Text("All tweaks are done in memory, so if something goes wrong, you can force reboot to revert changes.\n\nExploit discovered by Ian Beer of Google Project Zero. Created by the jailbreak.party team.")) {
                         VStack {
                             HStack {
                                 Button(action: {
@@ -47,9 +49,7 @@ struct ContentView: View {
                                         Text("Hide Dock")
                                     }
                                 }
-                                .frame(maxWidth: .infinity, minHeight: 50)
-                                .background(.green.opacity(0.2))
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .buttonStyle(TintedButton(color: .accent, fullWidth: false))
                                 
                                 Button(action: {
                                     dirtyZeroHide(path: "/System/Library/PrivateFrameworks/MaterialKit.framework/Assets.car")
@@ -59,13 +59,12 @@ struct ContentView: View {
                                         Text("Hide Home Bar")
                                     }
                                 }
-                                .frame(maxWidth: .infinity, minHeight: 50)
-                                .background(.green.opacity(0.2))
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .buttonStyle(TintedButton(color: .accent, fullWidth: false))
                             }
+                            
                             Button(action: {
                                 Alertinator.shared.prompt(title: "Enter custom path", placeholder: "/path/to/the/file/to/hide") { path in
-                                    if let isEmpty = path, !path!.isEmpty {
+                                    if let _ = path, !path!.isEmpty {
                                         dirtyZeroHide(path: path!)
                                     } else {
                                         Alertinator.shared.alert(title: "Invalid path", body: "Enter an actual path to what you want to hide/zero.")
@@ -76,19 +75,9 @@ struct ContentView: View {
                                     Image(systemName: "terminal.fill")
                                     Text("Custom Path")
                                 }
-                                .foregroundStyle(.red)
                             }
-                            .frame(maxWidth: .infinity, minHeight: 50)
-                            .background(.red.opacity(0.2))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .buttonStyle(TintedButton(color: .red, fullWidth: true))
                         }
-                    } header: {
-                        HStack {
-                            Image(systemName: "hammer.fill")
-                            Text("Tweaks")
-                        }
-                    } footer: {
-                        Text("All writes are done in memory, so if something goes wrong, you can force reboot.\n\nExploit discovered by Ian Beer of Google Project Zero. Created by the jailbreak.party team.")
                     }
                 }
             }
@@ -101,6 +90,58 @@ struct ContentView: View {
         var argv = args.map { strdup($0) }
         
         _ = permasign(Int32(args.count), &argv)
+    }
+}
+
+// i skidded this stuff from cowabunga, sorry lemin.
+struct MaterialView: UIViewRepresentable {
+    let material: UIBlurEffect.Style
+
+    init(_ material: UIBlurEffect.Style) {
+        self.material = material
+    }
+
+    func makeUIView(context: Context) -> UIVisualEffectView {
+        UIVisualEffectView(effect: UIBlurEffect(style: material))
+    }
+
+    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
+        uiView.effect = UIBlurEffect(style: material)
+    }
+}
+
+struct TintedButton: ButtonStyle {
+    var color: Color
+    var material: UIBlurEffect.Style?
+    var fullWidth: Bool = false
+    
+    func makeBody(configuration: Configuration) -> some View {
+        ZStack {
+            if fullWidth {
+                configuration.label
+                    .padding(15)
+                    .frame(maxWidth: .infinity)
+                    .background(material == nil ? AnyView(color.opacity(0.2)) : AnyView(MaterialView(material!)))
+                    .cornerRadius(8)
+                    .foregroundColor(color)
+            } else {
+                configuration.label
+                    .padding(15)
+                    .background(material == nil ? AnyView(color.opacity(0.2)) : AnyView(MaterialView(material!)))
+                    .cornerRadius(8)
+                    .foregroundColor(color)
+            }
+        }
+    }
+    
+    init(color: Color = .blue, fullWidth: Bool = false) {
+        self.color = color
+        self.fullWidth = fullWidth
+    }
+    init(color: Color = .blue, material: UIBlurEffect.Style, fullWidth: Bool = false) {
+        self.color = color
+        self.material = material
+        self.fullWidth = fullWidth
     }
 }
 
