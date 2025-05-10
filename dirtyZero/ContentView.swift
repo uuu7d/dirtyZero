@@ -41,36 +41,18 @@ extension Array: @retroactive RawRepresentable where Element: Codable {
 }
 
 var tweaks: [ZeroTweak] = [
-    ZeroTweak(icon: "dock.rectangle", name: "Dock", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/dockDark.materialrecipe", "/System/Library/PrivateFrameworks/CoreMaterial.framework/dockLight.materialrecipe"]),
-    ZeroTweak(icon: "line.3.horizontal", name: "Home Bar", paths: ["/System/Library/PrivateFrameworks/MaterialKit.framework/Assets.car"]),
-    ZeroTweak(icon: "folder", name: "Folder Backgrounds", paths: ["/System/Library/PrivateFrameworks/SpringBoardHome.framework/folderDark.materialrecipe", "/System/Library/PrivateFrameworks/SpringBoardHome.framework/folderLight.materialrecipe"]),
-    ZeroTweak(icon: "bell.badge", name: "Notification Backgrounds", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/platterStrokeLight.visualstyleset", "/System/Library/PrivateFrameworks/CoreMaterial.framework/platterStrokeDark.visualstyleset", "/System/Library/PrivateFrameworks/CoreMaterial.framework/plattersDark.materialrecipe", "/System/Library/PrivateFrameworks/CoreMaterial.framework/platters.materialrecipe"]),
-    ZeroTweak(icon: "lock.iphone", name: "Unlock Background", paths: ["/System/Library/PrivateFrameworks/CoverSheet.framework/dashBoardPasscodeBackground.materialrecipe"]),
-    ZeroTweak(icon: "iphone.gen3.radiowaves.left.and.right", name: "Haptic Touch Backgrounds", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/platformContentDark.materialrecipe", "/System/Library/PrivateFrameworks/CoreMaterial.framework/platformContentLight.materialrecipe"]),
-    ZeroTweak(icon: "battery.100.circle", name: "Battery Graphic (Charging)", paths: ["/System/Library/PrivateFrameworks/CoverSheet.framework/Assets.car"]),
-    ZeroTweak(icon: "square.grid.2x2", name: "Control Center Background", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/modulesBackground.materialrecipe"])
-]
-
-var FontTweaks: [ZeroTweak] = [
-    ZeroTweak(icon: "circle.slash", name: "Remove Emojis", paths: ["/System/Library/Fonts/CoreAddition/AppleColorEmoji-160px.ttc"]),
-    ZeroTweak(icon: "h.circle", name: "Helvetica Font", paths: ["/System/Library/Fonts/Core/SFUI.ttf"]),
-]
-
-var DangerZone: [ZeroTweak] = [
-    ZeroTweak(icon: "questionmark.app", name: "Broken Font", paths: ["/System/Library/Fonts/Core/SFUI.ttf", "/System/Library/Fonts/Core/Helvetica.ttc"]),
-    ZeroTweak(icon: "bell.slash", name: "Hide ALL Banners", paths: ["/System/Library/PrivateFrameworks/SpringBoard.framework/BannersAuthorizedBundleIDs.plist"]),
+    ZeroTweak(icon: "dock.rectangle", name: "Hide Dock", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/dockDark.materialrecipe", "/System/Library/PrivateFrameworks/CoreMaterial.framework/dockLight.materialrecipe"]),
+    ZeroTweak(icon: "line.3.horizontal", name: "Hide Home Bar", paths: ["/System/Library/PrivateFrameworks/MaterialKit.framework/Assets.car"]),
+    ZeroTweak(icon: "folder", name: "Hide Folder Backgrounds", paths: ["/System/Library/PrivateFrameworks/SpringBoardHome.framework/folderDark.materialrecipe", "/System/Library/PrivateFrameworks/SpringBoardHome.framework/folderLight.materialrecipe"]),
+    ZeroTweak(icon: "bell.badge", name: "Hide Notification Backgrounds", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/platterStrokeLight.visualstyleset", "/System/Library/PrivateFrameworks/CoreMaterial.framework/platterStrokeDark.visualstyleset", "/System/Library/PrivateFrameworks/CoreMaterial.framework/plattersDark.materialrecipe", "/System/Library/PrivateFrameworks/CoreMaterial.framework/platters.materialrecipe"]),
+    ZeroTweak(icon: "lock.iphone", name: "Hide Unlock Background", paths: ["/System/Library/PrivateFrameworks/CoverSheet.framework/dashBoardPasscodeBackground.materialrecipe"])
 ]
 
 struct ContentView: View {
     let device = Device.current
     @AppStorage("enabledTweaks") private var enabledTweakIds: [String] = []
-    
-    private var allTweaks: [ZeroTweak] {
-        tweaks + FontTweaks + DangerZone
-    }
-    
     private var enabledTweaks: [ZeroTweak] {
-        allTweaks.filter { tweak in enabledTweakIds.contains(tweak.id) }
+        tweaks.filter { tweak in enabledTweakIds.contains(tweak.id) }
     }
     
     private func isTweakEnabled(_ tweak: ZeroTweak) -> Bool {
@@ -90,15 +72,14 @@ struct ContentView: View {
             VStack {
                 List {
                     Section(header: HStack {
-                        Image(systemName: "terminal")
+                        Image(systemName: "terminal.fill")
                         Text("Logs")
                     }) {
                         HStack {
                             Spacer()
                             ZStack {
                                 LogView()
-                                    .padding(.vertical, 5)
-                                    .padding(.horizontal, 7)
+                                    .padding(3)
                                     .frame(width: 340, height: 260)
                             }
                             Spacer()
@@ -108,75 +89,9 @@ struct ContentView: View {
                         })
                     }
                     
-                    Section(
-                    header: HStack {
-                        Image(systemName: "gear")
-                        Text("Actions")
-                    },
-                    footer: VStack(alignment: .leading) {
-                        Text("All tweaks are done in memory, so if something goes wrong, you can force reboot to revert changes.\n\nExploit discovered by Ian Beer of Google Project Zero. Created by the jailbreak.party team.")
-                        Text("\nJoin the jailbreak.party discord!")
-                            .foregroundColor(.green)
-                            .underline()
-                            .onTapGesture {
-                                if let url = URL(string: "https://discord.gg/XPj66zZ4gT") {
-                                    UIApplication.shared.open(url)
-                                }
-                            }
-                    }
-                    ) {
-                        VStack {
-                            Button(action: {
-                                var applyingString = "[*] Applying the selected tweaks: "
-                                let tweakNames = enabledTweaks.map { $0.name }.joined(separator: ", ")
-                                applyingString += tweakNames
-                                
-                                print(applyingString)
-                                
-                                for tweak in enabledTweaks {
-                                    for path in tweak.paths {
-                                        dirtyZeroHide(path: path)
-                                    }
-                                }
-                                
-                                print("[*] All tweaks applied successfully!")
-                            }) {
-                                HStack {
-                                    Image(systemName: "checkmark.circle.fill")
-                                    Text("Apply Tweaks")
-                                }
-                            }
-                            .buttonStyle(TintedButton(color: enabledTweaks.isEmpty ? .accent.dark() : .accent, fullWidth: true))
-                            .contextMenu {
-                                Button {
-                                    Alertinator.shared.prompt(title: "Enter Custom Path", placeholder: "Path") { path in
-                                        if let _ = path, !path!.isEmpty {
-                                            dirtyZeroHide(path: path!)
-                                        } else {
-                                            Alertinator.shared.alert(title: "Invalid path", body: "Enter a vaild path that can be zeroed out.")
-                                        }
-                                    }
-                                } label: {
-                                    Label("Apply Custom Path", systemImage: "terminal")
-                                }
-                            }
-                            .disabled(enabledTweaks.isEmpty)
-                            
-                            Button(action: {
-                                dirtyZeroHide(path: "/System/Library/CoreServices/SpringBoard.app/SpringBoard")
-                            }) {
-                                HStack {
-                                    Image(systemName: "x.circle.fill")
-                                    Text("Remove Tweaks")
-                                }
-                            }
-                            .buttonStyle(TintedButton(color: .red, fullWidth: true))
-                        }
-                    }
-                    
                     Section(header: HStack {
-                        Image(systemName: "eye.slash")
-                        Text("Hide Items")
+                        Image(systemName: "hammer.fill")
+                        Text("Tweaks")
                     }) {
                         VStack {
                             ForEach(tweaks) { tweak in
@@ -208,69 +123,44 @@ struct ContentView: View {
                     }
                     
                     Section(header: HStack {
-                        Image(systemName: "character.cursor.ibeam")
-                        Text("Fonts")
-                    }) {
-                        VStack {
-                            ForEach(FontTweaks) { tweak in
-                                Button(action: {
-                                    Haptic.shared.play(.soft)
-                                    toggleTweak(tweak)
-                                }) {
-                                    HStack {
-                                        Image(systemName: tweak.icon)
-                                            .frame(width: 24, alignment: .center)
-                                        Text(tweak.name)
-                                            .lineLimit(1)
-                                            .scaledToFit()
-                                        Spacer()
-                                        if isTweakEnabled(tweak) {
-                                            Image(systemName: "checkmark.circle.fill")
-                                                .foregroundStyle(.accent)
-                                                .imageScale(.medium)
-                                        } else {
-                                            Image(systemName: "circle")
-                                                .foregroundStyle(.accent)
-                                                .imageScale(.medium)
-                                        }
-                                    }
+                        Image(systemName: "gear")
+                        Text("Actions")
+                    }, footer: Text("All tweaks are done in memory, so if something goes wrong, you can force reboot to revert changes.\n\nExploit discovered by Ian Beer of Google Project Zero. Created by the jailbreak.party team.")) {
+                        Button(action: {
+                            var applyingString = "[*] Applying the selected tweaks: "
+                            let tweakNames = enabledTweaks.map { $0.name }.joined(separator: ", ")
+                            applyingString += tweakNames
+                            
+                            print(applyingString)
+                            
+                            for tweak in enabledTweaks {
+                                for path in tweak.paths {
+                                    dirtyZeroHide(path: path)
                                 }
-                                .buttonStyle(TintedButton(color: .accent, fullWidth: false))
+                            }
+                            
+                            print("[*] All tweaks applied successfully!")
+                        }) {
+                            HStack {
+                                Image(systemName: "checkmark.circle.fill")
+                                Text("Apply")
                             }
                         }
-                    }
-                    
-                    Section(header: HStack {
-                        Image(systemName: "exclamationmark.triangle")
-                        Text("Danger Zone")
-                    }, footer: Text("**WARNING:** These features are only meant for fun, and can break features of your device.")) {
-                        VStack {
-                            ForEach(DangerZone) { tweak in
-                                Button(action: {
-                                    Haptic.shared.play(.soft)
-                                    toggleTweak(tweak)
-                                }) {
-                                    HStack {
-                                        Image(systemName: tweak.icon)
-                                            .frame(width: 24, alignment: .center)
-                                        Text(tweak.name)
-                                            .lineLimit(1)
-                                            .scaledToFit()
-                                        Spacer()
-                                        if isTweakEnabled(tweak) {
-                                            Image(systemName: "checkmark.circle.fill")
-                                                .foregroundStyle(.accent)
-                                                .imageScale(.medium)
-                                        } else {
-                                            Image(systemName: "circle")
-                                                .foregroundStyle(.accent)
-                                                .imageScale(.medium)
-                                        }
+                        .buttonStyle(TintedButton(color: enabledTweaks.isEmpty ? .accent.dark() : .accent, fullWidth: true))
+                        .contextMenu {
+                            Button {
+                                Alertinator.shared.prompt(title: "Enter custom path", placeholder: "/path/to/the/file/to/hide") { path in
+                                    if let _ = path, !path!.isEmpty {
+                                        dirtyZeroHide(path: path!)
+                                    } else {
+                                        Alertinator.shared.alert(title: "Invalid path", body: "Enter an actual path to what you want to hide/zero.")
                                     }
                                 }
-                                .buttonStyle(TintedButton(color: .accent, fullWidth: false))
+                            } label: {
+                                Label("(Debug) Use custom file path", systemImage: "apple.terminal")
                             }
                         }
+                        .disabled(enabledTweaks.isEmpty)
                     }
                 }
             }
@@ -319,7 +209,7 @@ struct TintedButton: ButtonStyle {
                     .foregroundStyle(color)
             } else {
                 configuration.label
-                    .padding(10)
+                    .padding(15)
                     .frame(maxWidth: .infinity)
                     .background(material == nil ? AnyView(color.opacity(0.2)) : AnyView(MaterialView(material!)))
                     .cornerRadius(8)
