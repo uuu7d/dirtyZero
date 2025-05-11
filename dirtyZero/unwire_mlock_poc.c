@@ -137,7 +137,7 @@ int permasign(int argc, char** argv) {
   }
   printf("deleted map entries before unwiring\n");
     
-  printf("[*] Done! Now respring/reload the file somehow...\n");
+  printf("[*] Wrote file successfully.\n");
 
   return 0;
 }

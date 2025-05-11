@@ -68,103 +68,180 @@ struct ContentView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            VStack {
-                List {
-                    Section(header: HStack {
-                        Image(systemName: "terminal.fill")
-                        Text("Logs")
-                    }) {
-                        HStack {
-                            Spacer()
-                            ZStack {
-                                LogView()
-                                    .padding(3)
-                                    .frame(width: 340, height: 260)
+        ZStack(alignment: .bottom) {
+            NavigationStack {
+                VStack {
+                    List {
+                        Section(header: HStack {
+                            Image(systemName: "terminal")
+                            Text("Logs")
+                        }) {
+                            ZStack(alignment: .bottom) {
+                                HStack {
+                                    Spacer()
+                                    ZStack {
+                                        LogView()
+                                            .padding(3)
+                                            .frame(width: 340, height: 260)
+                                    }
+                                    Spacer()
+                                }
+                                .onAppear(perform: {
+                                    print("[*] Welcome to dirtyZero!\n[*] Running on \(device.systemName!) \(device.systemVersion!), \(device.description)")
+                                })
+                                VStack {
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            Color.clear,
+                                            Color(.secondarySystemGroupedBackground).opacity(1)
+                                        ]),
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                    .frame(height: 50)
+                                }
                             }
-                            Spacer()
                         }
-                        .onAppear(perform: {
-                            print("[*] Welcome to dirtyZero!\n[*] Running on \(device.systemName!) \(device.systemVersion!), \(device.description)")
-                        })
-                    }
-                    
-                    Section(header: HStack {
-                        Image(systemName: "hammer.fill")
-                        Text("Tweaks")
-                    }) {
-                        VStack {
-                            ForEach(tweaks) { tweak in
-                                Button(action: {
-                                    Haptic.shared.play(.soft)
-                                    toggleTweak(tweak)
-                                }) {
-                                    HStack {
-                                        Image(systemName: tweak.icon)
-                                            .frame(width: 24, alignment: .center)
-                                        Text(tweak.name)
-                                            .lineLimit(1)
-                                            .scaledToFit()
-                                        Spacer()
-                                        if isTweakEnabled(tweak) {
-                                            Image(systemName: "checkmark.circle.fill")
-                                                .foregroundStyle(.accent)
-                                                .imageScale(.medium)
-                                        } else {
-                                            Image(systemName: "circle")
-                                                .foregroundStyle(.accent)
-                                                .imageScale(.medium)
+                        
+                        Section(header: HStack {
+                            Image(systemName: "hammer")
+                            Text("Tweaks")
+                        }) {
+                            VStack {
+                                ForEach(tweaks) { tweak in
+                                    Button(action: {
+                                        Haptic.shared.play(.soft)
+                                        toggleTweak(tweak)
+                                    }) {
+                                        HStack {
+                                            Image(systemName: tweak.icon)
+                                                .frame(width: 24, alignment: .center)
+                                            Text(tweak.name)
+                                                .lineLimit(1)
+                                                .scaledToFit()
+                                            Spacer()
+                                            if isTweakEnabled(tweak) {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .foregroundStyle(.accent)
+                                                    .imageScale(.medium)
+                                            } else {
+                                                Image(systemName: "circle")
+                                                    .foregroundStyle(.accent)
+                                                    .imageScale(.medium)
+                                            }
                                         }
                                     }
-                                }
-                                .buttonStyle(TintedButton(color: .accent, fullWidth: false))
-                            }
-                        }
-                    }
-                    
-                    Section(header: HStack {
-                        Image(systemName: "gear")
-                        Text("Actions")
-                    }, footer: Text("All tweaks are done in memory, so if something goes wrong, you can force reboot to revert changes.\n\nExploit discovered by Ian Beer of Google Project Zero. Created by the jailbreak.party team.")) {
-                        Button(action: {
-                            var applyingString = "[*] Applying the selected tweaks: "
-                            let tweakNames = enabledTweaks.map { $0.name }.joined(separator: ", ")
-                            applyingString += tweakNames
-                            
-                            print(applyingString)
-                            
-                            for tweak in enabledTweaks {
-                                for path in tweak.paths {
-                                    dirtyZeroHide(path: path)
+                                    .buttonStyle(TintedButton(color: .accent, fullWidth: false))
                                 }
                             }
-                            
-                            print("[*] All tweaks applied successfully!")
-                        }) {
-                            HStack {
-                                Image(systemName: "checkmark.circle.fill")
-                                Text("Apply")
-                            }
                         }
-                        .buttonStyle(TintedButton(color: enabledTweaks.isEmpty ? .accent.dark() : .accent, fullWidth: true))
-                        .contextMenu {
-                            Button {
-                                Alertinator.shared.prompt(title: "Enter custom path", placeholder: "/path/to/the/file/to/hide") { path in
-                                    if let _ = path, !path!.isEmpty {
-                                        dirtyZeroHide(path: path!)
-                                    } else {
-                                        Alertinator.shared.alert(title: "Invalid path", body: "Enter an actual path to what you want to hide/zero.")
+                        
+                        /*
+                        Section(header: HStack {
+                            Image(systemName: "gear")
+                            Text("Actions")
+                        }, footer: Text("All tweaks are done in memory, so if something goes wrong, you can force reboot to revert changes.\n\nExploit discovered by Ian Beer of Google Project Zero. Created by the jailbreak.party team.")) {
+                            Button(action: {
+                                var applyingString = "[*] Applying the selected tweaks: "
+                                let tweakNames = enabledTweaks.map { $0.name }.joined(separator: ", ")
+                                applyingString += tweakNames
+                                
+                                print(applyingString)
+                                
+                                for tweak in enabledTweaks {
+                                    for path in tweak.paths {
+                                        dirtyZeroHide(path: path)
                                     }
                                 }
-                            } label: {
-                                Label("(Debug) Use custom file path", systemImage: "apple.terminal")
+                                
+                                print("[*] All tweaks applied successfully!")
+                            }) {
+                                HStack {
+                                    Image(systemName: "checkmark.circle.fill")
+                                    Text("Apply")
+                                }
                             }
+                            .buttonStyle(TintedButton(color: enabledTweaks.isEmpty ? .accent.dark() : .accent, fullWidth: true))
+                            .contextMenu {
+                                Button {
+                                    Alertinator.shared.prompt(title: "Enter custom path", placeholder: "/path/to/the/file/to/hide") { path in
+                                        if let _ = path, !path!.isEmpty {
+                                            dirtyZeroHide(path: path!)
+                                        } else {
+                                            Alertinator.shared.alert(title: "Invalid path", body: "Enter an actual path to what you want to hide/zero.")
+                                        }
+                                    }
+                                } label: {
+                                    Label("(Debug) Use custom file path", systemImage: "apple.terminal")
+                                }
+                            }
+                            .disabled(enabledTweaks.isEmpty)
                         }
-                        .disabled(enabledTweaks.isEmpty)
+                        */
+                    }
+                    .safeAreaInset(edge: .bottom) {
+                        VStack {
+                            Button(action: {
+                                var applyingString = "[*] Applying the selected tweaks: "
+                                let tweakNames = enabledTweaks.map { $0.name }.joined(separator: ", ")
+                                applyingString += tweakNames
+                                
+                                print(applyingString)
+                                
+                                print("Paths to write: ")
+                                print(enabledTweaks)
+                                
+                                for tweak in enabledTweaks {
+                                    for path in tweak.paths {
+                                        dirtyZeroHide(path: path)
+                                    }
+                                }
+                                
+                                print("[!] All tweaks applied successfully!")
+                            }) {
+                                HStack {
+                                    Image(systemName: "checkmark.circle.fill")
+                                    Text("Apply")
+                                }
+                            }
+                            .padding(15)
+                            .frame(maxWidth: .infinity)
+                            .background(.green.opacity(0.2))
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(14)
+                            .foregroundStyle(.accent)
+                            .padding(.horizontal, 25)
+                            
+                            .contextMenu {
+                                Button {
+                                    Alertinator.shared.prompt(title: "Enter custom path", placeholder: "/path/to/the/file/to/hide") { path in
+                                        if let _ = path, !path!.isEmpty {
+                                            dirtyZeroHide(path: path!)
+                                        } else {
+                                            Alertinator.shared.alert(title: "Invalid path", body: "Enter an actual path to what you want to hide/zero.")
+                                        }
+                                    }
+                                } label: {
+                                    Label("(Debug) Use custom file path", systemImage: "apple.terminal")
+                                }
+                            }
+                            .disabled(enabledTweaks.isEmpty)
+                        }
+                        .padding(.top, 50)
+                        .background(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color.clear,
+                                    Color(.systemBackground).opacity(1)
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
                     }
                 }
+                .navigationTitle("dirtyZero")
             }
-            .navigationTitle("dirtyZero")
         }
     }
     
@@ -202,17 +279,17 @@ struct TintedButton: ButtonStyle {
         ZStack {
             if fullWidth {
                 configuration.label
-                    .padding(15)
+                    .padding(12)
                     .frame(maxWidth: .infinity)
                     .background(material == nil ? AnyView(color.opacity(0.2)) : AnyView(MaterialView(material!)))
-                    .cornerRadius(8)
+                    .cornerRadius(10)
                     .foregroundStyle(color)
             } else {
                 configuration.label
-                    .padding(15)
+                    .padding(12)
                     .frame(maxWidth: .infinity)
                     .background(material == nil ? AnyView(color.opacity(0.2)) : AnyView(MaterialView(material!)))
-                    .cornerRadius(8)
+                    .cornerRadius(10)
                     .foregroundStyle(color)
             }
         }
