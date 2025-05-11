@@ -7,7 +7,6 @@
 
 import SwiftUI
 import DeviceKit
-import notify
 
 struct ZeroTweak: Identifiable, Codable {
     var id: String { name }
@@ -188,16 +187,13 @@ struct ContentView: View {
                                 
                                 print(applyingString)
                                 
-                                print("Paths to write: ")
-                                print(enabledTweaks)
-                                
                                 for tweak in enabledTweaks {
                                     for path in tweak.paths {
                                         dirtyZeroHide(path: path)
                                     }
                                 }
                                 
-                                print("[!] All tweaks applied successfully!")
+                                print("[*] All tweaks applied successfully!")
                             }) {
                                 HStack {
                                     Image(systemName: "checkmark.circle.fill")
@@ -206,7 +202,7 @@ struct ContentView: View {
                             }
                             .padding(15)
                             .frame(maxWidth: .infinity)
-                            .background(.green.opacity(0.2))
+                            .background(.accent.opacity(0.2))
                             .background(.ultraThinMaterial)
                             .cornerRadius(14)
                             .foregroundStyle(.accent)
