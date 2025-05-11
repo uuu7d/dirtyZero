@@ -202,12 +202,11 @@ struct ContentView: View {
                             }
                             .padding(15)
                             .frame(maxWidth: .infinity)
-                            .background(.accent.opacity(0.2))
+                            .background(enabledTweaks.isEmpty ? .accent.opacity(0.06) : .accent.opacity(0.2))
                             .background(.ultraThinMaterial)
                             .cornerRadius(14)
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(enabledTweaks.isEmpty ? .accent.dark() : .accent)
                             .padding(.horizontal, 25)
-                            
                             .contextMenu {
                                 Button {
                                     Alertinator.shared.prompt(title: "Enter custom path", placeholder: "/path/to/the/file/to/hide") { path in
@@ -219,6 +218,12 @@ struct ContentView: View {
                                     }
                                 } label: {
                                     Label("(Debug) Use custom file path", systemImage: "apple.terminal")
+                                }
+                                
+                                Button {
+                                    dirtyZeroHide(path: "/usr/lib/dyld")
+                                } label: {
+                                    Label("(Debug) Panic", systemImage: "ant")
                                 }
                             }
                             .disabled(enabledTweaks.isEmpty)
@@ -242,10 +247,11 @@ struct ContentView: View {
     }
     
     func dirtyZeroHide(path: String) {
-        let args = ["permasign", path]
-        var argv = args.map { strdup($0) }
-        
-        _ = permasign(Int32(args.count), &argv)
+        do {
+            try zeroPoC(path: path)
+        } catch {
+            Alertinator.shared.alert(title: "Error!", body: "There was an error while running the exploit: \(error).")
+        }
     }
 }
 
