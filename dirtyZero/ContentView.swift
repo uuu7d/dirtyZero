@@ -106,25 +106,23 @@ struct ContentView: View {
                             Text("Logs")
                         }, footer: VStack(alignment: .leading) {
                             Text("All tweaks are done in memory, so if something goes wrong, you can force reboot to revert changes.")
-                            Text("Join the jailbreak.party Discord!")
-                                .foregroundColor(.accent)
-                                .onTapGesture {
-                                    if let url = URL(string: "https://discord.gg/XPj66zZ4gT") {
-                                        UIApplication.shared.open(url)
-                                    }
-                                }
+                            Text("[Join the jailbreak.party Discord!](https://discord.gg/XPj66zZ4gT)")
+                                .foregroundStyle(.accent)
                         }) {
-                            VStack {
-                                LogView()
-                                    .frame(width: .infinity, height: 220)
-                                .onAppear(perform: {
-                                    if !hasShownWelcome {
-                                        print("[!] Welcome to dirtyZero!\n[*] Running on \(device.systemName!) \(device.systemVersion!), \(device.description)")
-                                        hasShownWelcome = true
+                            ZStack(alignment: .bottom) {
+                                HStack {
+                                    Spacer()
+                                    ZStack {
+                                        LogView()
+                                            .padding(3)
+                                            .frame(width: 340, height: 260)
                                     }
+                                    Spacer()
+                                }
+                                .onAppear(perform: {
+                                    print("[*] Welcome to dirtyZero!\n[*] Running on \(device.systemName!) \(device.systemVersion!), \(device.description)")
                                 })
                             }
-                            .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                         }
                         
                         Section(header: HStack {
@@ -330,12 +328,13 @@ struct ContentView: View {
                                 .disabled(enabledTweaks.isEmpty)
                                 
                                 Button(action: {
-                                    print("[!] Rebooting Device...")
-                                    dirtyZeroHide(path: "/usr/lib/dyld")
+                                    Alertinator.shared.alert(title: "Your device will reboot.", body: "To revert all tweaks, your device will now reboot. Tap OK to continue.", action: {
+                                        dirtyZeroHide(path: "/usr/lib/dyld")
+                                    })
                                 }) {
                                     HStack {
-                                        Image(systemName: "x.circle.fill")
-                                        Text("Remove")
+                                        Image(systemName: "arrow.counterclockwise.circle")
+                                        Text("Revert")
                                     }
                                 }
                                 .padding(.vertical, 15)
