@@ -104,35 +104,27 @@ struct ContentView: View {
                         Section(header: HStack {
                             Image(systemName: "terminal")
                             Text("Logs")
-                        }) {
-                            ZStack(alignment: .bottom) {
-                                HStack {
-                                    Spacer()
-                                    ZStack {
-                                        LogView()
-                                            .padding(3)
-                                            .frame(width: 340, height: 260)
+                        }, footer: VStack(alignment: .leading) {
+                            Text("All tweaks are done in memory, so if something goes wrong, you can force reboot to revert changes.")
+                            Text("Join the jailbreak.party Discord!")
+                                .foregroundColor(.accent)
+                                .onTapGesture {
+                                    if let url = URL(string: "https://discord.gg/XPj66zZ4gT") {
+                                        UIApplication.shared.open(url)
                                     }
-                                    Spacer()
                                 }
+                        }) {
+                            VStack {
+                                LogView()
+                                    .frame(width: .infinity, height: 220)
                                 .onAppear(perform: {
                                     if !hasShownWelcome {
-                                        print("[*] Welcome to dirtyZero!\n[*] Running on \(device.systemName!) \(device.systemVersion!), \(device.description)")
+                                        print("[!] Welcome to dirtyZero!\n[*] Running on \(device.systemName!) \(device.systemVersion!), \(device.description)")
                                         hasShownWelcome = true
                                     }
                                 })
-                                VStack {
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            Color.clear,
-                                            Color(.secondarySystemGroupedBackground).opacity(1)
-                                        ]),
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    )
-                                    .frame(height: 50)
-                                }
                             }
+                            .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                         }
                         
                         Section(header: HStack {
@@ -166,6 +158,7 @@ struct ContentView: View {
                                     .buttonStyle(TintedButton(color: .accent, fullWidth: false))
                                 }
                             }
+                            .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                         }
                         
                         Section(header: HStack {
@@ -199,6 +192,7 @@ struct ContentView: View {
                                     .buttonStyle(TintedButton(color: .accent, fullWidth: false))
                                 }
                             }
+                            .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                         }
                         
                         Section(header: HStack {
@@ -232,6 +226,7 @@ struct ContentView: View {
                                     .buttonStyle(TintedButton(color: .accent, fullWidth: false))
                                 }
                             }
+                            .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                         }
                         
                         Section(header: HStack {
@@ -265,6 +260,7 @@ struct ContentView: View {
                                     .buttonStyle(TintedButton(color: .accent, fullWidth: false))
                                 }
                             }
+                            .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                         }
                     
                         Section(header: HStack {
@@ -298,57 +294,77 @@ struct ContentView: View {
                                     .buttonStyle(TintedButton(color: .accent, fullWidth: false))
                                 }
                             }
+                            .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                         }
                     }
+                    .listRowInsets(EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))
                     .safeAreaInset(edge: .bottom) {
                         VStack {
-                            Button(action: {
-                                var applyingString = "[*] Applying the selected tweaks: "
-                                let tweakNames = enabledTweaks.map { $0.name }.joined(separator: ", ")
-                                applyingString += tweakNames
-                                
-                                print(applyingString)
-                                
-                                for tweak in enabledTweaks {
-                                    for path in tweak.paths {
-                                        dirtyZeroHide(path: path)
+                            HStack {
+                                Button(action: {
+                                    var applyingString = "[*] Applying the selected tweaks: "
+                                    let tweakNames = enabledTweaks.map { $0.name }.joined(separator: ", ")
+                                    applyingString += tweakNames
+                                    
+                                    print(applyingString)
+                                    
+                                    for tweak in enabledTweaks {
+                                        for path in tweak.paths {
+                                            dirtyZeroHide(path: path)
+                                        }
+                                    }
+                                    
+                                    print("[!] All tweaks applied successfully!")
+                                }) {
+                                    HStack {
+                                        Image(systemName: "checkmark.circle.fill")
+                                        Text("Apply")
                                     }
                                 }
+                                .padding(.vertical, 15)
+                                .frame(maxWidth: .infinity)
+                                .background(enabledTweaks.isEmpty ? .accent.opacity(0.06) : .accent.opacity(0.2))
+                                .background(.ultraThinMaterial)
+                                .cornerRadius(14)
+                                .foregroundStyle(enabledTweaks.isEmpty ? .accent.opacity(0.7) : .accent)
+                                .disabled(enabledTweaks.isEmpty)
                                 
-                                print("[*] All tweaks applied successfully!")
-                            }) {
-                                HStack {
-                                    Image(systemName: "checkmark.circle.fill")
-                                    Text("Apply")
+                                Button(action: {
+                                    print("[!] Rebooting Device...")
+                                    dirtyZeroHide(path: "/usr/lib/dyld")
+                                }) {
+                                    HStack {
+                                        Image(systemName: "x.circle.fill")
+                                        Text("Remove")
+                                    }
                                 }
+                                .padding(.vertical, 15)
+                                .frame(maxWidth: .infinity)
+                                .background(.red.opacity(0.2))
+                                .background(.ultraThinMaterial)
+                                .cornerRadius(14)
+                                .foregroundStyle(.red)
                             }
-                            .padding(15)
-                            .frame(maxWidth: .infinity)
-                            .background(enabledTweaks.isEmpty ? .accent.opacity(0.06) : .accent.opacity(0.2))
-                            .background(.ultraThinMaterial)
-                            .cornerRadius(14)
-                            .foregroundStyle(enabledTweaks.isEmpty ? .accent.dark() : .accent)
                             .padding(.horizontal, 25)
                             .contextMenu {
                                 Button {
-                                    Alertinator.shared.prompt(title: "Enter custom path", placeholder: "/path/to/the/file/to/hide") { path in
+                                    Alertinator.shared.prompt(title: "Custom Path", placeholder: "Path") { path in
                                         if let _ = path, !path!.isEmpty {
                                             dirtyZeroHide(path: path!)
                                         } else {
-                                            Alertinator.shared.alert(title: "Invalid path", body: "Enter an actual path to what you want to hide/zero.")
+                                            Alertinator.shared.alert(title: "Invalid Path", body: "Enter a vaild path.")
                                         }
                                     }
                                 } label: {
-                                    Label("(Debug) Use custom file path", systemImage: "apple.terminal")
+                                    Label("Custom Path", systemImage: "apple.terminal")
                                 }
                                 
                                 Button {
                                     dirtyZeroHide(path: "/usr/lib/dyld")
                                 } label: {
-                                    Label("(Debug) Panic", systemImage: "ant")
+                                    Label("Panic", systemImage: "ant")
                                 }
                             }
-                            .disabled(enabledTweaks.isEmpty)
                         }
                         .padding(.top, 50)
                         .background(
@@ -372,7 +388,7 @@ struct ContentView: View {
         do {
             try zeroPoC(path: path)
         } catch {
-            Alertinator.shared.alert(title: "Error!", body: "There was an error while running the exploit: \(error).")
+            Alertinator.shared.alert(title: "Exploit Failed", body: "There was an error while running the exploit: \(error).")
         }
     }
 }
