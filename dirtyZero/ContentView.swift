@@ -74,7 +74,8 @@ var controlCenter: [ZeroTweak] = [
 struct ContentView: View {
     let device = Device.current
     @AppStorage("enabledTweaks") private var enabledTweakIds: [String] = []
-    
+    @State private var hasShownWelcome = false
+
     private var tweaks: [ZeroTweak] {
         springBoard + lockScreen + systemWideCustomization + soundEffects + controlCenter
     }
@@ -115,7 +116,10 @@ struct ContentView: View {
                                     Spacer()
                                 }
                                 .onAppear(perform: {
-                                    print("[*] Welcome to dirtyZero!\n[*] Running on \(device.systemName!) \(device.systemVersion!), \(device.description)")
+                                    if !hasShownWelcome {
+                                        print("[*] Welcome to dirtyZero!\n[*] Running on \(device.systemName!) \(device.systemVersion!), \(device.description)")
+                                        hasShownWelcome = true
+                                    }
                                 })
                                 VStack {
                                     LinearGradient(
