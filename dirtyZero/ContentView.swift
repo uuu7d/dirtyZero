@@ -39,17 +39,46 @@ extension Array: @retroactive RawRepresentable where Element: Codable {
     }
 }
 
-var tweaks: [ZeroTweak] = [
+var springBoard: [ZeroTweak] = [
     ZeroTweak(icon: "dock.rectangle", name: "Hide Dock", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/dockDark.materialrecipe", "/System/Library/PrivateFrameworks/CoreMaterial.framework/dockLight.materialrecipe"]),
-    ZeroTweak(icon: "line.3.horizontal", name: "Hide Home Bar", paths: ["/System/Library/PrivateFrameworks/MaterialKit.framework/Assets.car"]),
     ZeroTweak(icon: "folder", name: "Hide Folder Backgrounds", paths: ["/System/Library/PrivateFrameworks/SpringBoardHome.framework/folderDark.materialrecipe", "/System/Library/PrivateFrameworks/SpringBoardHome.framework/folderLight.materialrecipe"]),
-    ZeroTweak(icon: "bell.badge", name: "Hide Notification Backgrounds", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/platterStrokeLight.visualstyleset", "/System/Library/PrivateFrameworks/CoreMaterial.framework/platterStrokeDark.visualstyleset", "/System/Library/PrivateFrameworks/CoreMaterial.framework/plattersDark.materialrecipe", "/System/Library/PrivateFrameworks/CoreMaterial.framework/platters.materialrecipe"]),
-    ZeroTweak(icon: "lock.iphone", name: "Hide Unlock Background", paths: ["/System/Library/PrivateFrameworks/CoverSheet.framework/dashBoardPasscodeBackground.materialrecipe"])
+    ZeroTweak(icon: "list.bullet.rectangle", name: "Hide Haptic Touch BG", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/platformContentDark.materialrecipe", "/System/Library/PrivateFrameworks/CoreMaterial.framework/platformContentLight.materialrecipe"])
+]
+
+var lockScreen: [ZeroTweak] = [
+    ZeroTweak(icon: "bell", name: "Hide Notif & Player BG", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/platterStrokeLight.visualstyleset", "/System/Library/PrivateFrameworks/CoreMaterial.framework/platterStrokeDark.visualstyleset", "/System/Library/PrivateFrameworks/CoreMaterial.framework/plattersDark.materialrecipe", "/System/Library/PrivateFrameworks/CoreMaterial.framework/platters.materialrecipe"]),
+    ZeroTweak(icon: "numbers.rectangle", name: "Hide Passcode Background", paths: ["/System/Library/PrivateFrameworks/CoverSheet.framework/dashBoardPasscodeBackground.materialrecipe"]),
+    ZeroTweak(icon: "lock", name: "Hide Lock Icon", paths: ["/System/Library/PrivateFrameworks/SpringBoardUIServices.framework/lock@2x-812h.ca/main.caml", "/System/Library/PrivateFrameworks/SpringBoardUIServices.framework/lock@2x-896h.ca/main.caml", "/System/Library/PrivateFrameworks/SpringBoardUIServices.framework/lock@3x-812h.ca/main.caml", "/System/Library/PrivateFrameworks/SpringBoardUIServices.framework/lock@3x-896h.ca/main.caml", "/System/Library/PrivateFrameworks/SpringBoardUIServices.framework/lock@3x-d73.ca/main.caml"]),
+    ZeroTweak(icon: "bolt", name: "Hide Large Battery Icon", paths: ["/System/Library/PrivateFrameworks/CoverSheet.framework/Assets.car"])
+]
+
+var systemWideCustomization: [ZeroTweak] = [
+    ZeroTweak(icon: "line.3.horizontal", name: "Hide Home Bar", paths: ["/System/Library/PrivateFrameworks/MaterialKit.framework/Assets.car"]),
+    ZeroTweak(icon: "character.cursor.ibeam", name: "Helvetica Font", paths: ["/System/Library/Fonts/Core/SFUI.ttf"]),
+    ZeroTweak(icon: "circle.slash", name: "Remove Emojis", paths: ["/System/Library/Fonts/CoreAddition/AppleColorEmoji-160px.ttc"])
+]
+
+var soundEffects: [ZeroTweak] = [
+    ZeroTweak(icon: "dot.radiowaves.left.and.right", name: "Disable AirDrop Ping", paths: ["/System/Library/Audio/UISounds/Modern/airdrop_invite.cat"]),
+    ZeroTweak(icon: "bolt", name: "Disable Charge Sound", paths: ["/System/Library/Audio/UISounds/connect_power.caf"]),
+    ZeroTweak(icon: "battery.25", name: "Disable Low Battery Sound", paths: ["/System/Library/Audio/UISounds/low_power.caf"]),
+    ZeroTweak(icon: "creditcard", name: "Disable Payment Sounds", paths: ["/System/Library/Audio/UISounds/payment_success.caf", "/System/Library/Audio/UISounds/payment_failure.caf"])
+]
+
+var controlCenter: [ZeroTweak] = [
+    ZeroTweak(icon: "circle.grid.2x2", name: "Disable CC Background", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/modulesBackground.materialrecipe"]),
+    ZeroTweak(icon: "sun.max", name: "Disable Brightness Icon", paths: ["/System/Library/ControlCenter/Bundles/DisplayModule.bundle/Brightness.ca/main.caml"]),
+    ZeroTweak(icon: "moon", name: "Disable DND Icon", paths: ["/System/Library/PrivateFrameworks/FocusUI.framework/dnd_cg_02.ca/main.caml"])
 ]
 
 struct ContentView: View {
     let device = Device.current
     @AppStorage("enabledTweaks") private var enabledTweakIds: [String] = []
+    
+    private var tweaks: [ZeroTweak] {
+        springBoard + lockScreen + systemWideCustomization + soundEffects + controlCenter
+    }
+    
     private var enabledTweaks: [ZeroTweak] {
         tweaks.filter { tweak in enabledTweakIds.contains(tweak.id) }
     }
@@ -103,11 +132,143 @@ struct ContentView: View {
                         }
                         
                         Section(header: HStack {
-                            Image(systemName: "hammer")
-                            Text("Tweaks")
+                            Image(systemName: "house")
+                            Text("SpringBoard")
                         }) {
                             VStack {
-                                ForEach(tweaks) { tweak in
+                                ForEach(springBoard) { tweak in
+                                    Button(action: {
+                                        Haptic.shared.play(.soft)
+                                        toggleTweak(tweak)
+                                    }) {
+                                        HStack {
+                                            Image(systemName: tweak.icon)
+                                                .frame(width: 24, alignment: .center)
+                                            Text(tweak.name)
+                                                .lineLimit(1)
+                                                .scaledToFit()
+                                            Spacer()
+                                            if isTweakEnabled(tweak) {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .foregroundStyle(.accent)
+                                                    .imageScale(.medium)
+                                            } else {
+                                                Image(systemName: "circle")
+                                                    .foregroundStyle(.accent)
+                                                    .imageScale(.medium)
+                                            }
+                                        }
+                                    }
+                                    .buttonStyle(TintedButton(color: .accent, fullWidth: false))
+                                }
+                            }
+                        }
+                        
+                        Section(header: HStack {
+                            Image(systemName: "lock")
+                            Text("Lock Screen")
+                        }) {
+                            VStack {
+                                ForEach(lockScreen) { tweak in
+                                    Button(action: {
+                                        Haptic.shared.play(.soft)
+                                        toggleTweak(tweak)
+                                    }) {
+                                        HStack {
+                                            Image(systemName: tweak.icon)
+                                                .frame(width: 24, alignment: .center)
+                                            Text(tweak.name)
+                                                .lineLimit(1)
+                                                .scaledToFit()
+                                            Spacer()
+                                            if isTweakEnabled(tweak) {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .foregroundStyle(.accent)
+                                                    .imageScale(.medium)
+                                            } else {
+                                                Image(systemName: "circle")
+                                                    .foregroundStyle(.accent)
+                                                    .imageScale(.medium)
+                                            }
+                                        }
+                                    }
+                                    .buttonStyle(TintedButton(color: .accent, fullWidth: false))
+                                }
+                            }
+                        }
+                        
+                        Section(header: HStack {
+                            Image(systemName: "gear")
+                            Text("Systemwide Customization")
+                        }) {
+                            VStack {
+                                ForEach(systemWideCustomization) { tweak in
+                                    Button(action: {
+                                        Haptic.shared.play(.soft)
+                                        toggleTweak(tweak)
+                                    }) {
+                                        HStack {
+                                            Image(systemName: tweak.icon)
+                                                .frame(width: 24, alignment: .center)
+                                            Text(tweak.name)
+                                                .lineLimit(1)
+                                                .scaledToFit()
+                                            Spacer()
+                                            if isTweakEnabled(tweak) {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .foregroundStyle(.accent)
+                                                    .imageScale(.medium)
+                                            } else {
+                                                Image(systemName: "circle")
+                                                    .foregroundStyle(.accent)
+                                                    .imageScale(.medium)
+                                            }
+                                        }
+                                    }
+                                    .buttonStyle(TintedButton(color: .accent, fullWidth: false))
+                                }
+                            }
+                        }
+                        
+                        Section(header: HStack {
+                            Image(systemName: "speaker.wave.2")
+                            Text("Sound Effects")
+                        }) {
+                            VStack {
+                                ForEach(soundEffects) { tweak in
+                                    Button(action: {
+                                        Haptic.shared.play(.soft)
+                                        toggleTweak(tweak)
+                                    }) {
+                                        HStack {
+                                            Image(systemName: tweak.icon)
+                                                .frame(width: 24, alignment: .center)
+                                            Text(tweak.name)
+                                                .lineLimit(1)
+                                                .scaledToFit()
+                                            Spacer()
+                                            if isTweakEnabled(tweak) {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .foregroundStyle(.accent)
+                                                    .imageScale(.medium)
+                                            } else {
+                                                Image(systemName: "circle")
+                                                    .foregroundStyle(.accent)
+                                                    .imageScale(.medium)
+                                            }
+                                        }
+                                    }
+                                    .buttonStyle(TintedButton(color: .accent, fullWidth: false))
+                                }
+                            }
+                        }
+                    
+                        Section(header: HStack {
+                            Image(systemName: "square.grid.2x2")
+                            Text("Control Center")
+                        }) {
+                            VStack {
+                                ForEach(controlCenter) { tweak in
                                     Button(action: {
                                         Haptic.shared.play(.soft)
                                         toggleTweak(tweak)
