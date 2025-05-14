@@ -10,7 +10,6 @@
 
 import Foundation
 import Darwin
-import MachO
 
 let pageSize = sysconf(_SC_PAGESIZE)
 

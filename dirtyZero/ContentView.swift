@@ -47,7 +47,7 @@ var springBoard: [ZeroTweak] = [
 
 var lockScreen: [ZeroTweak] = [
     ZeroTweak(icon: "bell", name: "Hide Notif & Player BG", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/platterStrokeLight.visualstyleset", "/System/Library/PrivateFrameworks/CoreMaterial.framework/platterStrokeDark.visualstyleset", "/System/Library/PrivateFrameworks/CoreMaterial.framework/plattersDark.materialrecipe", "/System/Library/PrivateFrameworks/CoreMaterial.framework/platters.materialrecipe"]),
-    ZeroTweak(icon: "numbers.rectangle", name: "Hide Passcode Background", paths: ["/System/Library/PrivateFrameworks/CoverSheet.framework/dashBoardPasscodeBackground.materialrecipe"]),
+    ZeroTweak(icon: "ellipsis.rectangle", name: "Hide Passcode Background", paths: ["/System/Library/PrivateFrameworks/CoverSheet.framework/dashBoardPasscodeBackground.materialrecipe"]),
     ZeroTweak(icon: "lock", name: "Hide Lock Icon", paths: ["/System/Library/PrivateFrameworks/SpringBoardUIServices.framework/lock@2x-812h.ca/main.caml", "/System/Library/PrivateFrameworks/SpringBoardUIServices.framework/lock@2x-896h.ca/main.caml", "/System/Library/PrivateFrameworks/SpringBoardUIServices.framework/lock@3x-812h.ca/main.caml", "/System/Library/PrivateFrameworks/SpringBoardUIServices.framework/lock@3x-896h.ca/main.caml", "/System/Library/PrivateFrameworks/SpringBoardUIServices.framework/lock@3x-d73.ca/main.caml"]),
     ZeroTweak(icon: "bolt", name: "Hide Large Battery Icon", paths: ["/System/Library/PrivateFrameworks/CoverSheet.framework/Assets.car"])
 ]
@@ -295,49 +295,6 @@ struct ContentView: View {
                                 }
                             }
                         }
-                        
-                        /*
-                        Section(header: HStack {
-                            Image(systemName: "gear")
-                            Text("Actions")
-                        }, footer: Text("All tweaks are done in memory, so if something goes wrong, you can force reboot to revert changes.\n\nExploit discovered by Ian Beer of Google Project Zero. Created by the jailbreak.party team.")) {
-                            Button(action: {
-                                var applyingString = "[*] Applying the selected tweaks: "
-                                let tweakNames = enabledTweaks.map { $0.name }.joined(separator: ", ")
-                                applyingString += tweakNames
-                                
-                                print(applyingString)
-                                
-                                for tweak in enabledTweaks {
-                                    for path in tweak.paths {
-                                        dirtyZeroHide(path: path)
-                                    }
-                                }
-                                
-                                print("[*] All tweaks applied successfully!")
-                            }) {
-                                HStack {
-                                    Image(systemName: "checkmark.circle.fill")
-                                    Text("Apply")
-                                }
-                            }
-                            .buttonStyle(TintedButton(color: enabledTweaks.isEmpty ? .accent.dark() : .accent, fullWidth: true))
-                            .contextMenu {
-                                Button {
-                                    Alertinator.shared.prompt(title: "Enter custom path", placeholder: "/path/to/the/file/to/hide") { path in
-                                        if let _ = path, !path!.isEmpty {
-                                            dirtyZeroHide(path: path!)
-                                        } else {
-                                            Alertinator.shared.alert(title: "Invalid path", body: "Enter an actual path to what you want to hide/zero.")
-                                        }
-                                    }
-                                } label: {
-                                    Label("(Debug) Use custom file path", systemImage: "apple.terminal")
-                                }
-                            }
-                            .disabled(enabledTweaks.isEmpty)
-                        }
-                        */
                     }
                     .safeAreaInset(edge: .bottom) {
                         VStack {
