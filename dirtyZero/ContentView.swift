@@ -115,7 +115,7 @@ struct ContentView: View {
                                 .frame(width: 340, height: 260)
                                 .onAppear(perform: {
                                     if !hasShownWelcome {
-                                        print("[!] Welcome to dirtyZero!\n[*] Running on \(device.systemName!) \(device.systemVersion!), \(device.description)")
+                                        print("[*] Welcome to dirtyZero!\n[*] Running on \(device.systemName!) \(device.systemVersion!), \(device.description)")
                                         hasShownWelcome = true
                                     }
                                 })
