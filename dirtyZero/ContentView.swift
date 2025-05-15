@@ -111,24 +111,15 @@ struct ContentView: View {
                             Text("[Join the jailbreak.party Discord!](https://discord.gg/XPj66zZ4gT)")
                                 .foregroundStyle(.accent)
                         }) {
-                            ZStack(alignment: .bottom) {
-                                HStack {
-                                    Spacer()
-                                    ZStack {
-                                        LogView()
-                                            .padding(3)
-                                            .frame(width: 340, height: 260)
-                                    }
-                                    Spacer()
-                                }
+                            LogView()
+                                .frame(width: 340, height: 260)
                                 .onAppear(perform: {
                                     if !hasShownWelcome {
-                                        print("[*] Welcome to dirtyZero!\n[*] Running on \(device.systemName!) \(device.systemVersion!), \(device.description)")
                                         print("[!] Welcome to dirtyZero!\n[*] Running on \(device.systemName!) \(device.systemVersion!), \(device.description)")
                                         hasShownWelcome = true
                                     }
                                 })
-                            }
+                            .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                         }
                         
                         Section(header: HStack {
