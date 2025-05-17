@@ -67,7 +67,7 @@ var soundEffects: [ZeroTweak] = [
 
 var controlCenter: [ZeroTweak] = [
     ZeroTweak(icon: "square", name: "Disable CC Background", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/modulesBackground.materialrecipe"]),
-    ZeroTweak(icon: "circle.grid.2x2", name: "Disable CC Module Background", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/modulesBackground.materialrecipe"]),
+    ZeroTweak(icon: "circle.grid.2x2", name: "Disable CC Module Background", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/modulesSheer.descendantrecipe"]),
     ZeroTweak(icon: "sun.max", name: "Disable Brightness Icon", paths: ["/System/Library/ControlCenter/Bundles/DisplayModule.bundle/Brightness.ca/main.caml"]),
     ZeroTweak(icon: "moon", name: "Disable DND Icon", paths: ["/System/Library/PrivateFrameworks/FocusUI.framework/dnd_cg_02.ca/main.caml"])
 ]
@@ -77,7 +77,9 @@ struct ContentView: View {
     @AppStorage("enabledTweaks") private var enabledTweakIds: [String] = []
     
     @State private var hasShownWelcome = false
-
+    @State private var customZeroPath: String = ""
+    @State private var addedCustomPaths: [String] = []
+    
     private var tweaks: [ZeroTweak] {
         springBoard + lockScreen + systemWideCustomization + soundEffects + controlCenter
     }
@@ -291,6 +293,34 @@ struct ContentView: View {
                             }
                             .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                         }
+                        
+                        /*
+                        Section(header: HStack {
+                            Image(systemName: "gear")
+                            Text("Custom Tweaks")
+                        }) {
+                            VStack {
+                                TextField("File Path", text: $customZeroPath)
+                                    .padding(.bottom, 10)
+                                Button(action: {
+                                    dirtyZeroHide(path: customZeroPath)
+                                }) {
+                                    HStack {
+                                        Image(systemName: "plus.circle")
+                                        Text("Apply Custom Tweak")
+                                    }
+                                }
+                                .padding(.vertical, 15)
+                                .frame(maxWidth: .infinity)
+                                .background(customZeroPath.isEmpty ? .accent.opacity(0.06) : .accent.opacity(0.2))
+                                .background(.ultraThinMaterial)
+                                .cornerRadius(14)
+                                .foregroundStyle(customZeroPath.isEmpty ? .accent.opacity(0.7) : .accent)
+                                .disabled(customZeroPath.isEmpty)
+                            }
+                            .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+                        }
+                         */
                     }
                     .listRowInsets(EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))
                     .safeAreaInset(edge: .bottom) {
@@ -325,7 +355,7 @@ struct ContentView: View {
                                 .disabled(enabledTweaks.isEmpty)
                                 
                                 Button(action: {
-                                    Alertinator.shared.alert(title: "Your device will reboot.", body: "To revert all tweaks, your device will now reboot. Tap OK to continue.", action: {
+                                    Alertinator.shared.alert(title: "Device Will Reboot", body: "To revert all tweaks, your device will now reboot. Tap OK to continue.", action: {
                                         dirtyZeroHide(path: "/usr/lib/dyld")
                                     })
                                 }) {
