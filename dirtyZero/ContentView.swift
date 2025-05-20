@@ -7,6 +7,7 @@
 
 import SwiftUI
 import DeviceKit
+import UIKit
 
 struct ZeroTweak: Identifiable, Codable {
     var id: String { name }
@@ -42,7 +43,10 @@ extension Array: @retroactive RawRepresentable where Element: Codable {
 var springBoard: [ZeroTweak] = [
     ZeroTweak(icon: "dock.rectangle", name: "Hide Dock", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/dockDark.materialrecipe", "/System/Library/PrivateFrameworks/CoreMaterial.framework/dockLight.materialrecipe"]),
     ZeroTweak(icon: "folder", name: "Hide Folder Backgrounds", paths: ["/System/Library/PrivateFrameworks/SpringBoardHome.framework/folderDark.materialrecipe", "/System/Library/PrivateFrameworks/SpringBoardHome.framework/folderLight.materialrecipe"]),
-    ZeroTweak(icon: "list.bullet.rectangle", name: "Hide Alert & Touch Backgrounds", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/platformContentDark.materialrecipe", "/System/Library/PrivateFrameworks/CoreMaterial.framework/platformContentLight.materialrecipe"])
+    ZeroTweak(icon: "list.bullet.rectangle", name: "Hide Alert & Touch Backgrounds", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/platformContentDark.materialrecipe", "/System/Library/PrivateFrameworks/CoreMaterial.framework/platformContentLight.materialrecipe"]),
+    ZeroTweak(icon: "magnifyingglass", name: "Hide Spotlight Background", paths: ["/System/Library/PrivateFrameworks/SpringBoardHome.framework/knowledgeBackgroundDarkZoomed.descendantrecipe", "/System/Library/PrivateFrameworks/SpringBoardHome.framework/knowledgeBackgroundZoomed.descendantrecipe"]),
+    ZeroTweak(icon: "square.text.square", name: "Hide Widget Config BG", paths: ["/System/Library/PrivateFrameworks/SpringBoardHome.framework/stackConfigurationBackground.materialrecipe", "/System/Library/PrivateFrameworks/SpringBoardHome.framework/stackConfigurationForeground.materialrecipe"]),
+    ZeroTweak(icon: "square.dashed", name: "Hide App Library BG", paths: ["/System/Library/PrivateFrameworks/SpringBoardHome.framework/coplanarLeadingTrailingBackgroundBlur.materialrecipe"])
 ]
 
 var lockScreen: [ZeroTweak] = [
@@ -121,7 +125,7 @@ struct ContentView: View {
                                         hasShownWelcome = true
                                     }
                                 })
-                            .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+                                .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                         }
                         
                         Section(header: HStack {
@@ -259,7 +263,7 @@ struct ContentView: View {
                             }
                             .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                         }
-                    
+                        
                         Section(header: HStack {
                             Image(systemName: "square.grid.2x2")
                             Text("Control Center")
@@ -295,31 +299,31 @@ struct ContentView: View {
                         }
                         
                         /*
-                        Section(header: HStack {
-                            Image(systemName: "gear")
-                            Text("Custom Tweaks")
-                        }) {
-                            VStack {
-                                TextField("File Path", text: $customZeroPath)
-                                    .padding(.bottom, 10)
-                                Button(action: {
-                                    dirtyZeroHide(path: customZeroPath)
-                                }) {
-                                    HStack {
-                                        Image(systemName: "plus.circle")
-                                        Text("Apply Custom Tweak")
-                                    }
-                                }
-                                .padding(.vertical, 15)
-                                .frame(maxWidth: .infinity)
-                                .background(customZeroPath.isEmpty ? .accent.opacity(0.06) : .accent.opacity(0.2))
-                                .background(.ultraThinMaterial)
-                                .cornerRadius(14)
-                                .foregroundStyle(customZeroPath.isEmpty ? .accent.opacity(0.7) : .accent)
-                                .disabled(customZeroPath.isEmpty)
-                            }
-                            .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
-                        }
+                         Section(header: HStack {
+                         Image(systemName: "gear")
+                         Text("Custom Tweaks")
+                         }) {
+                         VStack {
+                         TextField("File Path", text: $customZeroPath)
+                         .padding(.bottom, 10)
+                         Button(action: {
+                         dirtyZeroHide(path: customZeroPath)
+                         }) {
+                         HStack {
+                         Image(systemName: "plus.circle")
+                         Text("Apply Custom Tweak")
+                         }
+                         }
+                         .padding(.vertical, 15)
+                         .frame(maxWidth: .infinity)
+                         .background(customZeroPath.isEmpty ? .accent.opacity(0.06) : .accent.opacity(0.2))
+                         .background(.ultraThinMaterial)
+                         .cornerRadius(14)
+                         .foregroundStyle(customZeroPath.isEmpty ? .accent.opacity(0.7) : .accent)
+                         .disabled(customZeroPath.isEmpty)
+                         }
+                         .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+                         }
                          */
                     }
                     .listRowInsets(EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))
@@ -340,13 +344,14 @@ struct ContentView: View {
                                     }
                                     
                                     print("[!] All tweaks applied successfully!")
+                                    Alertinator.shared.alert(title: "Tweaks Applied", body: "Now, respring using your preferred method. If you have RespringApp installed, click the blue Respring button.")
                                 }) {
                                     HStack {
                                         Image(systemName: "checkmark.circle")
                                         Text("Apply")
                                     }
                                 }
-                                .padding(.vertical, 15)
+                                .padding(.vertical, 13)
                                 .frame(maxWidth: .infinity)
                                 .background(enabledTweaks.isEmpty ? .accent.opacity(0.06) : .accent.opacity(0.2))
                                 .background(.ultraThinMaterial)
@@ -364,7 +369,7 @@ struct ContentView: View {
                                         Text("Revert")
                                     }
                                 }
-                                .padding(.vertical, 15)
+                                .padding(.vertical, 13)
                                 .frame(maxWidth: .infinity)
                                 .background(.red.opacity(0.2))
                                 .background(.ultraThinMaterial)
@@ -391,8 +396,30 @@ struct ContentView: View {
                                     Label("Panic", systemImage: "ant")
                                 }
                             }
+                            Button(action: {
+                                let bundleIdentifier = "com.respring.app"
+                                if let workspaceClass = NSClassFromString("LSApplicationWorkspace") as? NSObject.Type,
+                                   let workspace = workspaceClass.init() as? NSObject,
+                                   workspace.responds(to: NSSelectorFromString("openApplicationWithBundleID:")) {
+                                    workspace.perform(NSSelectorFromString("openApplicationWithBundleID:"), with: bundleIdentifier)
+                                } else {
+                                    Alertinator.shared.alert(title: "RespringApp Not Detected", body: "Make sure you have RespringApp installed, then try again.")
+                                }
+                            }) {
+                                HStack {
+                                    Image(systemName: "arrow.counterclockwise.circle")
+                                    Text("Respring")
+                                }
+                            }
+                            .padding(.vertical, 13)
+                            .frame(maxWidth: .infinity)
+                            .background(.blue.opacity(0.2))
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(14)
+                            .foregroundStyle(.blue)
+                            .padding(.horizontal, 25)
                         }
-                        .padding(.top, 50)
+                        .padding(.top, 70)
                         .background(
                             LinearGradient(
                                 gradient: Gradient(colors: [
@@ -422,15 +449,15 @@ struct ContentView: View {
 // i skidded this stuff from cowabunga, sorry lemin.
 struct MaterialView: UIViewRepresentable {
     let material: UIBlurEffect.Style
-
+    
     init(_ material: UIBlurEffect.Style) {
         self.material = material
     }
-
+    
     func makeUIView(context: Context) -> UIVisualEffectView {
         UIVisualEffectView(effect: UIBlurEffect(style: material))
     }
-
+    
     func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
         uiView.effect = UIBlurEffect(style: material)
     }
