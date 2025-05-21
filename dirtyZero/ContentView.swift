@@ -343,7 +343,7 @@ struct ContentView: View {
                                         }
                                     }
                                     
-                                    print("[!] All tweaks applied successfully!")
+                                    print("[*] All tweaks applied successfully!")
                                     Alertinator.shared.alert(title: "Tweaks Applied", body: "Now, respring using your preferred method. If you have RespringApp installed, click the blue Respring button.")
                                 }) {
                                     HStack {
@@ -397,11 +397,9 @@ struct ContentView: View {
                                 }
                             }
                             Button(action: {
-                                let bundleIdentifier = "com.respring.app"
-                                if let workspaceClass = NSClassFromString("LSApplicationWorkspace") as? NSObject.Type,
-                                   let workspace = workspaceClass.init() as? NSObject,
-                                   workspace.responds(to: NSSelectorFromString("openApplicationWithBundleID:")) {
-                                    workspace.perform(NSSelectorFromString("openApplicationWithBundleID:"), with: bundleIdentifier)
+                                let respringBundleID = "com.respring.app"
+                                if isDatAppInstalled(respringBundleID) {
+                                    LSApplicationWorkspace.default().openApplication(withBundleID: respringBundleID)
                                 } else {
                                     Alertinator.shared.alert(title: "RespringApp Not Detected", body: "Make sure you have RespringApp installed, then try again.")
                                 }
@@ -443,6 +441,37 @@ struct ContentView: View {
         } catch {
             Alertinator.shared.alert(title: "Exploit Failed", body: "There was an error while running the exploit: \(error).")
         }
+    }
+    
+    func isDatAppInstalled(_ bundleID: String) -> Bool {
+        typealias SBSLaunchFunction = @convention(c) (
+            String,
+            URL?,
+            [String: Any]?,
+            [String: Any]?,
+            Bool
+        ) -> Int32
+        
+        guard let sbsLib = dlopen("/System/Library/PrivateFrameworks/SpringBoardServices.framework/SpringBoardServices", RTLD_NOW) else {
+            print("[!] dlopen fail !!")
+            return false
+        }
+        
+        defer {
+            dlclose(sbsLib)
+        }
+        
+        guard let sbsAddr = dlsym(sbsLib, "SBSLaunchApplicationWithIdentifierAndURLAndLaunchOptions") else {
+            print("[!] dlsym fail !!")
+            return false
+        }
+        
+        print("[*] here comes the super secret trollstore detector \"sandbox escape\" app store edition")
+        let sbsFunction = unsafeBitCast(sbsAddr, to: SBSLaunchFunction.self)
+        
+        let result = sbsFunction(bundleID, nil, nil, nil, true)
+        
+        return result == 9
     }
 }
 
