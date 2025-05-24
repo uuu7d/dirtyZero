@@ -46,7 +46,7 @@ var springBoard: [ZeroTweak] = [
     ZeroTweak(icon: "list.bullet.rectangle", name: "Hide Alert & Touch Backgrounds", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/platformContentDark.materialrecipe", "/System/Library/PrivateFrameworks/CoreMaterial.framework/platformContentLight.materialrecipe"]),
     ZeroTweak(icon: "magnifyingglass", name: "Hide Spotlight Background", paths: ["/System/Library/PrivateFrameworks/SpringBoardHome.framework/knowledgeBackgroundDarkZoomed.descendantrecipe", "/System/Library/PrivateFrameworks/SpringBoardHome.framework/knowledgeBackgroundZoomed.descendantrecipe"]),
     ZeroTweak(icon: "square.text.square", name: "Hide Widget Config BG", paths: ["/System/Library/PrivateFrameworks/SpringBoardHome.framework/stackConfigurationBackground.materialrecipe", "/System/Library/PrivateFrameworks/SpringBoardHome.framework/stackConfigurationForeground.materialrecipe"]),
-    ZeroTweak(icon: "square.dashed", name: "Hide App Library BG", paths: ["/System/Library/PrivateFrameworks/SpringBoardHome.framework/coplanarLeadingTrailingBackgroundBlur.materialrecipe"])
+    ZeroTweak(icon: "square.dashed", name: "Hide App Library BG", paths: ["/System/Library/PrivateFrameworks/SpringBoardHome.framework/coplanarLeadingTrailingBackgroundBlur.materialrecipe"]),
 ]
 
 var lockScreen: [ZeroTweak] = [
@@ -70,7 +70,6 @@ var soundEffects: [ZeroTweak] = [
 ]
 
 var controlCenter: [ZeroTweak] = [
-    ZeroTweak(icon: "square", name: "Disable CC Background", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/modulesBackground.materialrecipe"]),
     ZeroTweak(icon: "circle.grid.2x2", name: "Disable CC Module Background", paths: ["/System/Library/PrivateFrameworks/CoreMaterial.framework/modulesSheer.descendantrecipe"]),
     ZeroTweak(icon: "sun.max", name: "Disable Brightness Icon", paths: ["/System/Library/ControlCenter/Bundles/DisplayModule.bundle/Brightness.ca/main.caml"]),
     ZeroTweak(icon: "moon", name: "Disable DND Icon", paths: ["/System/Library/PrivateFrameworks/FocusUI.framework/dnd_cg_02.ca/main.caml"])
@@ -267,6 +266,8 @@ struct ContentView: View {
                         Section(header: HStack {
                             Image(systemName: "square.grid.2x2")
                             Text("Control Center")
+                        }, footer: HStack {
+                            Text("**WARNING:** If you'd like to use the **Disable CC Module Background**, remove the Focus module first as it causes a respring loop.")
                         }) {
                             VStack {
                                 ForEach(controlCenter) { tweak in
@@ -297,34 +298,6 @@ struct ContentView: View {
                             }
                             .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                         }
-                        
-                        /*
-                         Section(header: HStack {
-                         Image(systemName: "gear")
-                         Text("Custom Tweaks")
-                         }) {
-                         VStack {
-                         TextField("File Path", text: $customZeroPath)
-                         .padding(.bottom, 10)
-                         Button(action: {
-                         dirtyZeroHide(path: customZeroPath)
-                         }) {
-                         HStack {
-                         Image(systemName: "plus.circle")
-                         Text("Apply Custom Tweak")
-                         }
-                         }
-                         .padding(.vertical, 15)
-                         .frame(maxWidth: .infinity)
-                         .background(customZeroPath.isEmpty ? .accent.opacity(0.06) : .accent.opacity(0.2))
-                         .background(.ultraThinMaterial)
-                         .cornerRadius(14)
-                         .foregroundStyle(customZeroPath.isEmpty ? .accent.opacity(0.7) : .accent)
-                         .disabled(customZeroPath.isEmpty)
-                         }
-                         .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
-                         }
-                         */
                     }
                     .listRowInsets(EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))
                     .safeAreaInset(edge: .bottom) {
@@ -365,7 +338,7 @@ struct ContentView: View {
                                     })
                                 }) {
                                     HStack {
-                                        Image(systemName: "arrow.counterclockwise.circle")
+                                        Image(systemName: "x.circle")
                                         Text("Revert")
                                     }
                                 }
