@@ -266,9 +266,8 @@ struct ContentView: View {
                         Section(header: HStack {
                             Image(systemName: "square.grid.2x2")
                             Text("Control Center")
-                        }, footer: HStack {
-                            Text("**WARNING:** If you'd like to use the **Disable CC Module Background**, remove the Focus module first as it causes a respring loop.")
-                        }) {
+                        }, footer: Text("**WARNING:** If you'd like to use the **Disable CC Module Background**, remove the Focus module first as it causes a respring loop.")
+                        ) {
                             VStack {
                                 ForEach(controlCenter) { tweak in
                                     Button(action: {
